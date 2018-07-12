@@ -99,16 +99,17 @@ export default class GameController {
     // add answer to givenAnswers: 
     game.givenAnswers.push(update)
 
-    // Check if answer is the right answer or a timeout, and update the score   
+    // Check if answer is the right answer or a timeout, and update the score 
+    let playerr = update.player === 'a' ? game.players[0].user.name : game.players[1].user.name 
     if(update.answer === 'timeout'){
       game.scores[update.player] -= 3
       game.scores.message = `No answer is given. 3 points are subtracted from both players`
     } else if(update.answer === game.questions[game.currentQuestion].rightAnswer){
       game.scores[update.player] += 5 
-      game.scores.message = `Player ${update.player} gave the right answer and earned 5 points`
+      game.scores.message = `${playerr} gave the right answer and earned 5 points`
     } else {
       game.scores[update.player] -= 5
-      game.scores.message = `Player ${update.player} gave the wrong answer, 5 points are subtracted`
+      game.scores.message = `${playerr} gave the wrong answer, 5 points are subtracted`
     } 
 
     // check if the game is finished
