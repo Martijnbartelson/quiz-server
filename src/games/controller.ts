@@ -83,27 +83,39 @@ export default class GameController {
   // @Authorized()
   @Patch('/games/:id([0-9]+)')
   async updateGame(
-    // @CurrentUser() user: User,
+    @CurrentUser() user: User,
     @Param('id') gameId: number,
     @BodyParam("update") update: Update
   ) {
     const game = await Game.findOneById(gameId)
     if (!game) throw new NotFoundError(`Game does not exist`)
     
-    //TODO: add all the validation: Questions can only be answered once etc....
-    
-    // const player = await Player.findOne({ user, game })
-    // if (!player) throw new ForbiddenError(`You are not part of this game`)
-    // if (game.status !== 'started') throw new BadRequestError(`The game is not started yet`)
+    //TODO: add validation: Questions can only be answered once etc....
+
+    const player = await Player.findOne({ user, game })
+    if (!player) throw new ForbiddenError(`You are not part of this game`)
+    if (game.status !== 'started') throw new BadRequestError(`The game is not started yet`)
     
     // add answer to givenAnswers: 
     game.givenAnswers.push(update)
 
-    // Check if answer is the right answer, and update the score   
-    update.answer === game.questions[game.currentQuestion].rightAnswer ? game.scores[update.player] += 5 : game.scores[update.player] -= 5
+    // Check if answer is the right answer or a timeout, and update the score   
+    if(update.answer === 'timeout'){
+      game.scores[update.player] -= 3
+      game.scores.message = `No answer is given. 3 points are subtracted from both players`
+    } else if(update.answer === game.questions[game.currentQuestion].rightAnswer){
+      game.scores[update.player] += 5 
+      game.scores.message = `Player ${update.player} gave the right answer and earned 5 points`
+    } else {
+      game.scores[update.player] -= 5
+      game.scores.message = `Player ${update.player} gave the wrong answer, 5 points are subtracted`
+    } 
 
     // check if the game is finished
-    if(game.currentQuestion >= 10){ game.status = 'finished' } else { game.currentQuestion += 1}
+    if(game.currentQuestion > 8){ 
+      game.status = 'finished' 
+      game.winner = game.scores.a > game.scores.b ? 'a' : 'b'
+    } else { game.currentQuestion += 1 }
 
     // save game to database
     game.save()

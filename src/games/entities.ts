@@ -5,6 +5,13 @@ import Question from '../questions/entity'
 export type Status = 'pending' | 'started' | 'finished'
 export type Players = 'a' | 'b' 
 
+interface Scores {
+  a: number
+  b: number
+  message: string
+}
+
+
 @Entity()
 export class Game extends BaseEntity {
 
@@ -25,8 +32,8 @@ export class Game extends BaseEntity {
   givenAnswers: Object[]
 
   // Todo: make interface for scores
-  @Column('json',{default: {"a": 0, "b": 0}})
-  scores: Object
+  @Column('json',{default: {"a": 0, "b": 0, message: ''}})
+  scores: Scores
 
 	@OneToMany(_ => Player, player => player.game, {eager:true})
   players: Player[]
@@ -37,7 +44,7 @@ export class Game extends BaseEntity {
 }
 
 @Entity()
-@Index(['game', 'user', 'answer'], {unique:true})
+@Index(['game', 'user', 'player'], {unique:true})
 export class Player extends BaseEntity {
 
   @PrimaryGeneratedColumn()
@@ -46,12 +53,12 @@ export class Player extends BaseEntity {
   // @Column() // if compilation doesn't work, comment this two lines out, then compile again
   // userId: number
 
+  // player: Players
+
+  @Column('text', {nullable: true})
   player: Players
 
-  @Column('char', {length: 1, nullable: true})
-  answer: Symbol
-
-  @ManyToOne(_ => User, user => user.players)
+  @ManyToOne(_ => User, user => user.players, {eager:true})
   user: User
 
   @ManyToOne(_ => Game, game => game.players)
