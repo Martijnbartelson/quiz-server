@@ -1,6 +1,6 @@
 import { BaseEntity, PrimaryGeneratedColumn, Column, Entity, Index, OneToMany, ManyToOne, ManyToMany, JoinTable} from 'typeorm'
 import User from '../users/entity'
-import Question from '../questions/entity'
+// import Question from '../questions/entity'
 
 export type Status = 'pending' | 'started' | 'finished'
 export type Players = 'a' | 'b' 
@@ -38,9 +38,11 @@ export class Game extends BaseEntity {
 	@OneToMany(_ => Player, player => player.game, {eager:true})
   players: Player[]
   
-  @ManyToMany(_ => Question, questions => questions.games, {eager:true})
-  @JoinTable()
-  questions: Question[]
+  @Column('json',{default: []})
+  questions: any
+  // @ManyToMany(_ => Question, questions => questions.games, {eager:true})
+  // @JoinTable()
+  // questions: Question[]
 }
 
 @Entity()
