@@ -15,8 +15,8 @@ import {secret} from './jwt'
 const app = new Koa()
 const server = new Server(app.callback())
 export const io = IO(server)
-const port = process.env.PORT
-// const port = process.env.PORT || 4000
+// const port = process.env.PORT
+const port = process.env.PORT || 4000
 
 useKoaServer(app, {
   cors: true,
