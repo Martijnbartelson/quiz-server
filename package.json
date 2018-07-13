@@ -1,5 +1,5 @@
 {
-  "name": "game-starter-b15-server",
+  "name": "quiz-awesomeness",
   "version": "1.0.0",
   "main": "target/index.js",
   "private": true,
@@ -26,6 +26,7 @@
     "koa-multer": "^1.0.2",
     "koa-router": "^7.4.0",
     "mocha": "^5.0.4",
+    "nodemon": "^1.18.1",
     "pg": "^7.4.1",
     "routing-controllers": "^0.7.7",
     "socket.io": "^2.0.4",

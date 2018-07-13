@@ -80,25 +80,25 @@ export default class GameController {
     @CurrentUser() user: User,
     @Param('id') gameId: number
   ) {
-    const game = await Game.findOneById(gameId)
-    if (!game) throw new BadRequestError(`Game does not exist`)
-    if (game.status !== 'pending') throw new BadRequestError(`Game is already started`)
+		const game = await Game.findOneById(gameId)
+		if (!game) throw new BadRequestError(`Game does not exist`)
+		if (game.status !== 'pending') throw new BadRequestError(`Game is already started`)
+		console.log("Join Game Controller works!")
+		game.status = 'started'
+		await game.save()
 
-    game.status = 'started'
-    await game.save()
+		const player = await Player.create({
+		game, 
+		user,
+		player: 'b'
+		}).save()
 
-    const player = await Player.create({
-      game, 
-      user,
-      player: 'b'
-    }).save()
+		io.emit('action', {
+		type: 'UPDATE_GAME',
+		payload: await Game.findOneById(game.id)
+		})
 
-    io.emit('action', {
-      type: 'UPDATE_GAME',
-      payload: await Game.findOneById(game.id)
-    })
-
-    return player
+		return player
   }
 
   @Authorized()
