@@ -31,6 +31,7 @@
     "routing-controllers": "^0.7.7",
     "socket.io": "^2.0.4",
     "socketio-jwt-auth": "^0.0.6",
+    "trivia-api": "^1.0.1",
     "ts-node": "^5.0.1",
     "typeorm": "0.1.19",
     "typescript": "^2.7.2"

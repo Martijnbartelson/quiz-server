@@ -1,8 +1,10 @@
+const Trivia = require('trivia-api')
+const trivia = new Trivia({ encoding: 'base64' });
 import { 
   JsonController, Authorized, CurrentUser, Post, Get, Param, BodyParam, BadRequestError, ForbiddenError, NotFoundError, HttpCode, Patch
 } from 'routing-controllers'
 import User from '../users/entity'
-import Question from '../questions/entity'
+// import Question from '../questions/entity'
 import { Game, Player } from './entities'
 import {io} from '../index'
 
@@ -26,15 +28,34 @@ export default class GameController {
   @Post('/games')
   @HttpCode(201)
   async createGame(
-    @CurrentUser() user: User
+    @CurrentUser() user: User,
+    @BodyParam("options") cOptions
   ) {
     // TODO: Load 10 random questions from Question
-    const randomQuestions = await Question.find({ 
-      take: 10
-    })
-   
+    // const randomQuestions = await Question.find({ 
+    //   take: 10
+    // })
+
+      
+      
+    let options = {
+      category: +cOptions.category,
+      type: 'multiple',
+      amount: 10,
+      difficulty: cOptions.difficulty
+    };
+
+    console.log(options);
+    
+
+    let questions = await trivia.getQuestions(options)
+
+    questions.results.map(question=>question.answers=question.incorrect_answers.push(question.correct_answer))
+
+    
+  
     const entity = await Game.create({
-      questions:randomQuestions
+      questions: questions.results
     }).save()
     
     await Player.create({
@@ -104,7 +125,7 @@ export default class GameController {
     if(update.answer === 'timeout'){
       game.scores[update.player] -= 3
       game.scores.message = `No answer is given. 3 points are subtracted from both players`
-    } else if(update.answer === game.questions[game.currentQuestion].rightAnswer){
+    } else if(update.answer === game.questions[game.currentQuestion].correct_answer){
       game.scores[update.player] += 5 
       game.scores.message = `${playerr} gave the right answer and earned 5 points`
     } else {
